@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cahier — Guide d'utilisation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #EEF1F6;
+    --surface: #FFFFFF;
+    --ink: #10141C;
+    --ink-soft: #545B6B;
+    --ink-faint: #8E93A3;
+    --sidebar-bg: #0F1420;
+    --sidebar-text: #C7CCDA;
+    --sidebar-text-dim: #6B7286;
+    --line: #DDE2EA;
+    --line-soft: #E9ECF2;
+
+    --cat-demarrage: #2F6FED;
+    --cat-fonctionnalites: #12A594;
+    --cat-guides: #7C5CFC;
+    --cat-depannage: #E2A33D;
+
+    --radius: 10px;
+    --sidebar-w: 280px;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  h1,h2,h3{
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin: 0 0 .5em 0;
+  }
+
+  code, .mono{
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+  }
+
+  a{ color: var(--cat-demarrage); }
+
+  button{ font-family: inherit; }
+
+  /* ---------- Layout shell ---------- */
+  .shell{
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    width: var(--sidebar-w);
+    flex-shrink: 0;
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top:0; left:0; bottom:0;
+    z-index: 20;
+    transition: transform .25s ease;
+  }
+
+  .brand{
+    padding: 22px 22px 16px 22px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+  .brand-mark{
+    width: 30px; height:30px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--cat-demarrage), var(--cat-guides));
+    flex-shrink:0;
+    position:relative;
+  }
+  .brand-mark::after{
+    content:"";
+    position:absolute; inset: 8px;
+    border-left: 2px solid rgba(255,255,255,.85);
+    border-bottom: 2px solid rgba(255,255,255,.85);
+    border-radius: 1px;
+  }
+  .brand-name{
+    font-family:'Fraunces', serif;
+    font-weight: 600;
+    font-size: 18px;
+    color: #fff;
+  }
+  .brand-tagline{
+    font-size: 11px;
+    color: var(--sidebar-text-dim);
+    margin-top: 1px;
+  }
+
+  .search-wrap{
+    padding: 14px 18px;
+  }
+  .search-box{
+    width:100%;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 8px;
+    padding: 8px 10px 8px 32px;
+    color: #fff;
+    font-size: 13px;
+    outline:none;
+    position:relative;
+  }
+  .search-box::placeholder{ color: var(--sidebar-text-dim); }
+  .search-box:focus{ border-color: var(--cat-demarrage); }
+  .search-icon{
+    position:absolute;
+    margin-left: 10px;
+    margin-top: -24px;
+    width: 13px; height:13px;
+    color: var(--sidebar-text-dim);
+    pointer-events:none;
+  }
+
+  .nav{
+    flex:1;
+    overflow-y:auto;
+    padding: 4px 12px 20px 12px;
+  }
+  .nav-group{ margin-top: 18px; }
+  .nav-group-title{
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--sidebar-text-dim);
+    padding: 0 10px 6px 10px;
+    font-weight: 600;
+  }
+  .nav-item{
+    display:flex;
+    align-items:center;
+    gap: 9px;
+    width:100%;
+    text-align:left;
+    background:none;
+    border:none;
+    color: var(--sidebar-text);
+    padding: 7px 10px;
+    border-radius: 7px;
+    font-size: 13.5px;
+    cursor:pointer;
+    position:relative;
+  }
+  .nav-item:hover{ background: rgba(255,255,255,.06); color:#fff; }
+  .nav-item.active{ background: rgba(255,255,255,.1); color:#fff; }
+  .nav-dot{
+    width:6px; height:6px; border-radius:50%;
+    flex-shrink:0;
+    background: var(--dot-color, #666);
+  }
+  .nav-item.hidden{ display:none; }
+
+  .sidebar-footer{
+    padding: 14px 22px 18px 22px;
+    border-top: 1px solid rgba(255,255,255,.08);
+    font-size: 11.5px;
+    color: var(--sidebar-text-dim);
+  }
+
+  .menu-toggle{
+    display:none;
+    position: fixed;
+    top: 14px; left: 14px;
+    z-index: 30;
+    background: var(--sidebar-bg);
+    color:#fff;
+    border:none;
+    width: 38px; height: 38px;
+    border-radius: 8px;
+    cursor:pointer;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* ---------- Main content ---------- */
+  .main{
+    margin-left: var(--sidebar-w);
+    flex:1;
+    display:flex;
+    justify-content:center;
+    padding: 56px 40px 100px 40px;
+    min-width: 0;
+  }
+
+  .page{
+    max-width: 700px;
+    width:100%;
+    display:none;
+  }
+  .page.active{ display:block; }
+
+  .page-tag{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing:.06em;
+    padding: 4px 10px 4px 8px;
+    border-radius: 100px;
+    background: color-mix(in srgb, var(--tag-color) 12%, white);
+    color: var(--tag-color);
+    margin-bottom: 16px;
+  }
+  .page-tag::before{
+    content:"";
+    width:6px; height:6px; border-radius:50%;
+    background: var(--tag-color);
+  }
+
+  .page-content{
+    border-left: 3px solid var(--tag-color, var(--line));
+    padding-left: 24px;
+  }
+
+  .page h1{ font-size: 30px; margin-bottom: 6px; }
+  .page-lede{
+    color: var(--ink-soft);
+    font-size: 15.5px;
+    margin-bottom: 30px;
+  }
+  .page h2{
+    font-size: 18px;
+    margin-top: 34px;
+    padding-top: 4px;
+  }
+  .page p{ color: var(--ink); margin: 10px 0; }
+  .page p.muted{ color: var(--ink-soft); }
+
+  .page ul, .page ol{ padding-left: 20px; margin: 10px 0; }
+  .page li{ margin: 5px 0; }
+
+  .card{
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin: 16px 0;
+  }
+  .card-title{
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    display:flex; align-items:center; gap:7px;
+  }
+
+  .kbd{
+    display:inline-block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-bottom-width:2px;
+    border-radius:5px;
+    padding: 1px 6px;
+    color: var(--ink);
+  }
+
+  .callout{
+    display:flex;
+    gap: 10px;
+    background: color-mix(in srgb, var(--callout-color, var(--cat-depannage)) 8%, white);
+    border: 1px solid color-mix(in srgb, var(--callout-color, var(--cat-depannage)) 25%, white);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    margin: 18px 0;
+    font-size: 14px;
+  }
+  .callout b{ color: var(--callout-color, var(--cat-depannage)); }
+
+  .faq-item{
+    border-bottom: 1px solid var(--line-soft);
+    padding: 14px 0;
+  }
+  .faq-q{
+    font-weight: 600;
+    cursor:pointer;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .faq-a{
+    color: var(--ink-soft);
+    margin-top: 8px;
+    display:none;
+  }
+  .faq-item.open .faq-a{ display:block; }
+  .faq-item.open .faq-q .chev{ transform: rotate(180deg); }
+  .chev{ transition: transform .15s ease; color: var(--ink-faint); }
+
+  .prevnext{
+    display:flex;
+    justify-content:space-between;
+    gap: 14px;
+    margin-top: 44px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .pn-btn{
+    flex:1;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    cursor:pointer;
+    text-align:left;
+  }
+  .pn-btn:hover{ border-color: var(--cat-demarrage); }
+  .pn-btn.next{ text-align:right; }
+  .pn-label{ font-size: 11px; color: var(--ink-faint); text-transform:uppercase; letter-spacing:.05em;}
+  .pn-title{ font-size: 13.5px; font-weight:600; margin-top:2px; }
+
+  .empty-state{
+    text-align:center;
+    padding: 60px 20px;
+    color: var(--ink-soft);
+  }
+
+  @media (max-width: 880px){
+    .sidebar{ transform: translateX(-100%); }
+    .sidebar.open{ transform: translateX(0); }
+    .main{ margin-left: 0; padding: 80px 20px 80px 20px; }
+    .menu-toggle{ display:flex; }
+  }
+</style>
+</head>
+<body>
+
+<button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">
+  <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 4.5H16M2 9H16M2 13.5H16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+</button>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div>
+        <div class="brand-name">Cahier</div>
+        <div class="brand-tagline">Guide d'utilisation</div>
+      </div>
+    </div>
+
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M11 11L14.5 14.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <input class="search-box" id="searchBox" type="text" placeholder="Rechercher dans le guide…">
+    </div>
+
+    <div class="nav" id="nav"><!-- généré en JS --></div>
+
+    <div class="sidebar-footer">Version 1.4 · Mis à jour le 20 août 2026</div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div id="pages"><!-- généré en JS --></div>
+  </main>
+
+</div>
+
+<script>
+/* ==========================================================
+   STRUCTURE DE CONTENU — remplace ce tableau par le tien.
+   Chaque page a : id, groupe, titre, catégorie (couleur), lede, html
+   Catégories dispo : demarrage / fonctionnalites / guides / depannage
+========================================================== */
+const CATEGORY_COLORS = {
+  demarrage:        { label: "Démarrage",        color: "var(--cat-demarrage)" },
+  fonctionnalites:  { label: "Fonctionnalités",  color: "var(--cat-fonctionnalites)" },
+  guides:           { label: "Guides pratiques", color: "var(--cat-guides)" },
+  depannage:        { label: "Dépannage & FAQ",  color: "var(--cat-depannage)" },
+};
+
+const CONTENT = [
+  {
+    group: "Démarrage",
+    pages: [
+      {
+        id: "intro",
+        cat: "demarrage",
+        title: "Bienvenue dans Cahier",
+        lede: "Un aperçu rapide de ce que Cahier permet de faire et comment naviguer dans ce guide.",
+        html: `
+          <p>Cahier est une application de prise de notes pensée pour capturer une idée en moins de trois secondes et la retrouver tout aussi vite. Ce guide couvre l'installation, les fonctionnalités principales et les questions les plus fréquentes.</p>
+          <div class="card">
+            <div class="card-title">💡 Astuce</div>
+            <p class="muted" style="margin:0">Utilise la recherche dans la barre latérale pour sauter directement à une section.</p>
+          </div>
+          <h2>Ce que couvre ce guide</h2>
+          <ul>
+            <li>Installation et création de compte</li>
+            <li>Prise en main des fonctionnalités clés</li>
+            <li>Guides pas-à-pas pour les tâches courantes</li>
+            <li>Dépannage et réponses aux questions fréquentes</li>
+          </ul>
+        `
+      },
+      {
+        id: "installation",
+        cat: "demarrage",
+        title: "Installation",
+        lede: "Installer Cahier sur ordinateur ou mobile en moins de deux minutes.",
+        html: `
+          <h2>Sur ordinateur</h2>
+          <ol>
+            <li>Rends-toi sur <code>cahier.exemple.com/telecharger</code></li>
+            <li>Choisis ton système (Windows, macOS, Linux)</li>
+            <li>Lance l'installateur puis connecte-toi</li>
+          </ol>
+          <h2>Sur mobile</h2>
+          <p>Cherche « Cahier » sur l'App Store ou le Google Play Store.</p>
+          <div class="callout" style="--callout-color: var(--cat-demarrage)">
+            <span>ℹ️</span>
+            <p style="margin:0"><b>Bon à savoir —</b> tes notes se synchronisent automatiquement entre tous tes appareils une fois connecté au même compte.</p>
+          </div>
+        `
+      },
+      {
+        id: "premiers-pas",
+        cat: "demarrage",
+        title: "Premiers pas",
+        lede: "Créer ta première note et comprendre l'interface en un coup d'œil.",
+        html: `
+          <p>Appuie sur <span class="kbd">N</span> pour créer une nouvelle note depuis n'importe quel écran.</p>
+          <h2>L'interface en trois zones</h2>
+          <ul>
+            <li><b>Colonne de gauche</b> — tes carnets et étiquettes</li>
+            <li><b>Colonne du milieu</b> — la liste de tes notes</li>
+            <li><b>Zone principale</b> — l'éditeur de note</li>
+          </ul>
+        `
+      },
+    ]
+  },
+  {
+    group: "Fonctionnalités",
+    pages: [
+      {
+        id: "carnets",
+        cat: "fonctionnalites",
+        title: "Carnets et étiquettes",
+        lede: "Organiser ses notes sans y passer des heures.",
+        html: `
+          <p>Les carnets regroupent tes notes par grand thème (Travail, Perso, Projets…). Les étiquettes, elles, traversent les carnets pour un classement transversal — par exemple <code>#urgent</code> ou <code>#idée</code>.</p>
+          <div class="card">
+            <div class="card-title">📁 Exemple d'organisation</div>
+            <p class="muted" style="margin:0">Carnet « Travail » → notes étiquetées #réunion, #suivi, #brouillon</p>
+          </div>
+        `
+      },
+      {
+        id: "recherche",
+        cat: "fonctionnalites",
+        title: "Recherche instantanée",
+        lede: "Retrouver n'importe quelle note en quelques frappes.",
+        html: `
+          <p>Ouvre la recherche avec <span class="kbd">Ctrl</span> + <span class="kbd">K</span> (ou <span class="kbd">⌘</span> + <span class="kbd">K</span> sur Mac). La recherche porte sur le titre, le contenu et les étiquettes.</p>
+        `
+      },
+      {
+        id: "collaboration",
+        cat: "fonctionnalites",
+        title: "Partage et collaboration",
+        lede: "Inviter d'autres personnes à consulter ou modifier une note.",
+        html: `
+          <p>Clique sur <b>Partager</b> en haut de l'éditeur, puis choisis un niveau d'accès :</p>
+          <ul>
+            <li><b>Lecture seule</b> — la personne peut consulter sans modifier</li>
+            <li><b>Modification</b> — la personne peut éditer en temps réel</li>
+          </ul>
+        `
+      },
+    ]
+  },
+  {
+    group: "Guides pratiques",
+    pages: [
+      {
+        id: "import",
+        cat: "guides",
+        title: "Importer des notes existantes",
+        lede: "Migrer depuis une autre application en quelques étapes.",
+        html: `
+          <ol>
+            <li>Exporte tes notes depuis ton ancienne application (format .md ou .txt de préférence)</li>
+            <li>Dans Cahier, va dans <code>Réglages → Importer</code></li>
+            <li>Sélectionne le dossier exporté et confirme</li>
+          </ol>
+        `
+      },
+      {
+        id: "automatisation",
+        cat: "guides",
+        title: "Automatiser un modèle de note",
+        lede: "Gagner du temps sur les notes que tu crées souvent.",
+        html: `
+          <p>Crée un modèle depuis <code>Réglages → Modèles → Nouveau</code>, puis associe-le à un raccourci clavier pour le réutiliser instantanément.</p>
+        `
+      },
+    ]
+  },
+  {
+    group: "Dépannage & FAQ",
+    pages: [
+      {
+        id: "sync-probleme",
+        cat: "depannage",
+        title: "La synchronisation ne fonctionne pas",
+        lede: "Diagnostiquer et résoudre les problèmes de synchronisation courants.",
+        html: `
+          <div class="callout">
+            <span>⚠️</span>
+            <p style="margin:0"><b>Avant tout —</b> vérifie ta connexion internet et que tu es connecté au même compte sur tous tes appareils.</p>
+          </div>
+          <ol>
+            <li>Va dans <code>Réglages → Compte → Forcer la synchronisation</code></li>
+            <li>Si le problème persiste, déconnecte-toi puis reconnecte-toi</li>
+            <li>Toujours bloqué ? Contacte le support avec ton identifiant de compte</li>
+          </ol>
+        `
+      },
+      {
+        id: "faq",
+        cat: "depannage",
+        title: "Questions fréquentes",
+        lede: "Les réponses aux questions les plus posées par les utilisateurs.",
+        html: `
+          <div class="faq-item">
+            <div class="faq-q">Cahier est-il gratuit ? <span class="chev">▾</span></div>
+            <div class="faq-a">L'offre de base est gratuite avec un nombre de notes illimité. L'offre payante ajoute l'historique de versions et le partage avancé.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q">Puis-je utiliser Cahier hors-ligne ? <span class="chev">▾</span></div>
+            <div class="faq-a">Oui, toutes tes notes restent accessibles hors-ligne et se synchronisent dès que la connexion revient.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q">Comment supprimer définitivement une note ? <span class="chev">▾</span></div>
+            <div class="faq-a">Les notes supprimées restent 30 jours dans la corbeille avant suppression définitive. Tu peux forcer la suppression depuis la corbeille.</div>
+          </div>
+        `
+      },
+    ]
+  },
+];
+
+/* ========================================================== */
+
+const navEl = document.getElementById('nav');
+const pagesEl = document.getElementById('pages');
+const flatPages = [];
+
+CONTENT.forEach(group => {
+  const groupDiv = document.createElement('div');
+  groupDiv.className = 'nav-group';
+  groupDiv.innerHTML = `<div class="nav-group-title">${group.group}</div>`;
+
+  group.pages.forEach(page => {
+    flatPages.push(page);
+    const catColor = CATEGORY_COLORS[page.cat].color;
+
+    // nav item
+    const btn = document.createElement('button');
+    btn.className = 'nav-item';
+    btn.dataset.id = page.id;
+    btn.dataset.search = (page.title + ' ' + page.lede).toLowerCase();
+    btn.style.setProperty('--dot-color', catColor);
+    btn.innerHTML = `<span class="nav-dot"></span>${page.title}`;
+    btn.addEventListener('click', () => goTo(page.id));
+    groupDiv.appendChild(btn);
+
+    // page content
+    const pageDiv = document.createElement('div');
+    pageDiv.className = 'page';
+    pageDiv.id = 'page-' + page.id;
+    pageDiv.style.setProperty('--tag-color', catColor);
+    pageDiv.innerHTML = `
+      <div class="page-tag">${CATEGORY_COLORS[page.cat].label}</div>
+      <div class="page-content">
+        <h1>${page.title}</h1>
+        <p class="page-lede">${page.lede}</p>
+        ${page.html}
+      </div>
+    `;
+    pagesEl.appendChild(pageDiv);
+  });
+
+  navEl.appendChild(groupDiv);
+});
+
+// prev/next footer, built after all pages known
+flatPages.forEach((page, i) => {
+  const prev = flatPages[i - 1];
+  const next = flatPages[i + 1];
+  const pn = document.createElement('div');
+  pn.className = 'prevnext';
+  pn.innerHTML = `
+    ${prev ? `<button class="pn-btn prev" data-nav="${prev.id}"><div class="pn-label">← Précédent</div><div class="pn-title">${prev.title}</div></button>` : `<div style="flex:1"></div>`}
+    ${next ? `<button class="pn-btn next" data-nav="${next.id}"><div class="pn-label">Suivant →</div><div class="pn-title">${next.title}</div></button>` : `<div style="flex:1"></div>`}
+  `;
+  document.querySelector('#page-' + page.id + ' .page-content').appendChild(pn);
+});
+document.querySelectorAll('[data-nav]').forEach(btn => {
+  btn.addEventListener('click', () => goTo(btn.dataset.nav));
+});
+
+function goTo(id){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id)?.classList.add('active');
+  document.querySelector(`.nav-item[data-id="${id}"]`)?.classList.add('active');
+  window.location.hash = id;
+  document.getElementById('sidebar').classList.remove('open');
+  window.scrollTo(0,0);
+}
+
+// initial page
+goTo(location.hash ? location.hash.slice(1) : flatPages[0].id);
+
+// search filter
+document.getElementById('searchBox').addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase().trim();
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.toggle('hidden', q.length > 0 && !item.dataset.search.includes(q));
+  });
+  document.querySelectorAll('.nav-group').forEach(group => {
+    const anyVisible = [...group.querySelectorAll('.nav-item')].some(i => !i.classList.contains('hidden'));
+    group.style.display = anyVisible ? '' : 'none';
+  });
+});
+
+// mobile menu toggle
+document.getElementById('menuToggle').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('open');
+});
+
+// FAQ accordion (delegated)
+document.addEventListener('click', (e) => {
+  const q = e.target.closest('.faq-q');
+  if (q) q.parentElement.classList.toggle('open');
+});
+</script>
+
+</body>
+</html>
